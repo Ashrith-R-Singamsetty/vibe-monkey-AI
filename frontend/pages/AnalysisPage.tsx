@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import backend from '~backend/client';
 import { LoadingState } from '../components/LoadingState';
@@ -8,7 +8,7 @@ import { TechStackResults } from '../components/TechStackResults';
 import { FeatureResults } from '../components/FeatureResults';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Download } from 'lucide-react';
+import { RefreshCw, Download, ArrowRight } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
 interface IdeaData {
@@ -25,6 +25,7 @@ interface IdeaData {
 
 export function AnalysisPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [ideaData, setIdeaData] = useState<IdeaData | null>(null);
   const [activeTab, setActiveTab] = useState('validation');
@@ -110,6 +111,15 @@ export function AnalysisPage() {
     });
   };
 
+  const handleGoToKanban = () => {
+    const results = {
+      validation: validationQuery.data,
+      techStack: techStackQuery.data,
+      features: featuresQuery.data,
+    };
+    navigate("/kanban", { state: { results, data: ideaData } });
+  };
+
   if (!ideaData) {
     return (
       <div className="text-center py-16">
@@ -181,25 +191,33 @@ export function AnalysisPage() {
           </Button>
         </div>
       ) : (
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="validation">Validation Analysis</TabsTrigger>
-            <TabsTrigger value="techstack">Tech Stack</TabsTrigger>
-            <TabsTrigger value="features">Features & Roadmap</TabsTrigger>
-          </TabsList>
+        <>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="validation">Validation Analysis</TabsTrigger>
+              <TabsTrigger value="techstack">Tech Stack</TabsTrigger>
+              <TabsTrigger value="features">Features & Roadmap</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="validation" className="space-y-6">
-            {validationQuery.data && <ValidationResults data={validationQuery.data} />}
-          </TabsContent>
+            <TabsContent value="validation" className="space-y-6">
+              {validationQuery.data && <ValidationResults data={validationQuery.data} />}
+            </TabsContent>
 
-          <TabsContent value="techstack" className="space-y-6">
-            {techStackQuery.data && <TechStackResults data={techStackQuery.data} />}
-          </TabsContent>
+            <TabsContent value="techstack" className="space-y-6">
+              {techStackQuery.data && <TechStackResults data={techStackQuery.data} />}
+            </TabsContent>
 
-          <TabsContent value="features" className="space-y-6">
-            {featuresQuery.data && <FeatureResults data={featuresQuery.data} />}
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="features" className="space-y-6">
+              {featuresQuery.data && <FeatureResults data={featuresQuery.data} />}
+            </TabsContent>
+          </Tabs>
+          <div className="mt-12 text-center">
+            <Button size="lg" onClick={handleGoToKanban} className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+              Next Kanban
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </>
       )}
     </div>
   );

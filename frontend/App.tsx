@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { HomePage } from './pages/HomePage';
 import { AnalysisPage } from './pages/AnalysisPage';
 import { Navigation } from './components/Navigation';
+import KanbanPage from './pages/KanbanPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,6 +25,7 @@ function AppInner() {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/analysis/:id" element={<AnalysisPage />} />
+            <Route path="/kanban" element={<KanbanPage />} />
           </Routes>
         </main>
         <Toaster />
