@@ -26,10 +26,17 @@ interface FeatureCategory {
   features: Feature[];
 }
 
+interface DevelopmentPhase {
+  phase: string;
+  features: string[];
+  estimatedWeeks: number;
+}
+
 interface GenerateFeaturesResponse {
   categories: FeatureCategory[];
   mvpFeatures: string[];
   developmentOrder: string[];
+  developmentPhases: DevelopmentPhase[];
   totalMVPHours: number;
   totalFullHours: number;
 }
@@ -55,7 +62,7 @@ Based on the startup idea, generate a comprehensive feature specification includ
 3. Development roadmap with:
    - MVP feature list
    - Recommended development order
-   - Total time estimates
+   - Development phases (e.g., Phase 1: MVP, Phase 2: V1, Phase 3: Future) with features and time estimates.
 
 Guidelines:
 - Focus on user value and business impact
@@ -89,6 +96,13 @@ Return valid JSON matching this structure:
   ],
   "mvpFeatures": ["feature names"],
   "developmentOrder": ["feature names in order"],
+  "developmentPhases": [
+    {
+      "phase": "string",
+      "features": ["feature names"],
+      "estimatedWeeks": number
+    }
+  ],
   "totalMVPHours": number,
   "totalFullHours": number
 }`;
@@ -146,134 +160,77 @@ Return valid JSON matching this structure:
     } catch (error) {
       console.error("Feature generation error:", error);
       
-      // Fallback response with comprehensive feature set
+      const fallbackFeatures = [
+        {
+          name: "User Registration",
+          description: "Allow users to create accounts and access the platform",
+          userStory: "As a new user, I want to create an account so that I can access the platform features",
+          acceptanceCriteria: [
+            "Given I'm on the registration page, when I enter valid details, then my account is created",
+            "Given I'm registering, when I enter an existing email, then I see an error message",
+            "Given I've registered, when I check my email, then I receive a confirmation email"
+          ],
+          priority: "high" as const,
+          complexity: "simple" as const,
+          estimatedHours: 8,
+          isMVP: true,
+          dependencies: []
+        },
+        {
+          name: "User Authentication",
+          description: "Secure login and session management for users",
+          userStory: "As a registered user, I want to log in securely so that I can access my account",
+          acceptanceCriteria: [
+            "Given I have an account, when I enter correct credentials, then I'm logged in",
+            "Given I enter wrong credentials, when I try to log in, then I see an error",
+            "Given I'm logged in, when I close the browser, then I remain logged in on return"
+          ],
+          priority: "high" as const,
+          complexity: "simple" as const,
+          estimatedHours: 6,
+          isMVP: true,
+          dependencies: ["User Registration"]
+        },
+        {
+          name: "Core Feature Implementation",
+          description: "Implementation of the main feature that solves the primary user problem",
+          userStory: "As a user, I want to use the core functionality so that I can solve my primary problem",
+          acceptanceCriteria: [
+            "Given I'm logged in, when I access the main feature, then it works as expected",
+            "Given I use the core functionality, when I complete an action, then I see the results",
+            "Given the feature processes my request, when it's complete, then I'm notified"
+          ],
+          priority: "high" as const,
+          complexity: "complex" as const,
+          estimatedHours: 40,
+          isMVP: true,
+          dependencies: ["User Authentication"]
+        },
+      ];
+
       return {
         categories: [
           {
             category: "Core Features",
-            features: [
-              {
-                name: "User Registration",
-                description: "Allow users to create accounts and access the platform",
-                userStory: "As a new user, I want to create an account so that I can access the platform features",
-                acceptanceCriteria: [
-                  "Given I'm on the registration page, when I enter valid details, then my account is created",
-                  "Given I'm registering, when I enter an existing email, then I see an error message",
-                  "Given I've registered, when I check my email, then I receive a confirmation email"
-                ],
-                priority: "high" as const,
-                complexity: "simple" as const,
-                estimatedHours: 8,
-                isMVP: true,
-                dependencies: []
-              },
-              {
-                name: "User Authentication",
-                description: "Secure login and session management for users",
-                userStory: "As a registered user, I want to log in securely so that I can access my account",
-                acceptanceCriteria: [
-                  "Given I have an account, when I enter correct credentials, then I'm logged in",
-                  "Given I enter wrong credentials, when I try to log in, then I see an error",
-                  "Given I'm logged in, when I close the browser, then I remain logged in on return"
-                ],
-                priority: "high" as const,
-                complexity: "simple" as const,
-                estimatedHours: 6,
-                isMVP: true,
-                dependencies: ["User Registration"]
-              },
-              {
-                name: "User Profile",
-                description: "Allow users to view and edit their profile information",
-                userStory: "As a user, I want to manage my profile so that I can keep my information up to date",
-                acceptanceCriteria: [
-                  "Given I'm logged in, when I view my profile, then I see my current information",
-                  "Given I'm on my profile page, when I edit and save changes, then they are updated",
-                  "Given I change my email, when I save, then I receive a verification email"
-                ],
-                priority: "medium" as const,
-                complexity: "simple" as const,
-                estimatedHours: 4,
-                isMVP: false,
-                dependencies: ["User Authentication"]
-              }
-            ]
-          },
-          {
-            category: "Main Functionality",
-            features: [
-              {
-                name: "Core Feature Implementation",
-                description: "Implementation of the main feature that solves the primary user problem",
-                userStory: "As a user, I want to use the core functionality so that I can solve my primary problem",
-                acceptanceCriteria: [
-                  "Given I'm logged in, when I access the main feature, then it works as expected",
-                  "Given I use the core functionality, when I complete an action, then I see the results",
-                  "Given the feature processes my request, when it's complete, then I'm notified"
-                ],
-                priority: "high" as const,
-                complexity: "complex" as const,
-                estimatedHours: 40,
-                isMVP: true,
-                dependencies: ["User Authentication"]
-              },
-              {
-                name: "Data Management",
-                description: "Allow users to create, read, update, and delete their data",
-                userStory: "As a user, I want to manage my data so that I can organize my information effectively",
-                acceptanceCriteria: [
-                  "Given I'm logged in, when I create new data, then it's saved to my account",
-                  "Given I have existing data, when I view it, then I see all my information",
-                  "Given I want to modify data, when I edit and save, then changes are persisted"
-                ],
-                priority: "high" as const,
-                complexity: "moderate" as const,
-                estimatedHours: 24,
-                isMVP: true,
-                dependencies: ["Core Feature Implementation"]
-              }
-            ]
-          },
-          {
-            category: "Enhanced Features",
-            features: [
-              {
-                name: "Search Functionality",
-                description: "Allow users to search through their data and content",
-                userStory: "As a user, I want to search my content so that I can quickly find what I need",
-                acceptanceCriteria: [
-                  "Given I have data, when I enter a search term, then I see relevant results",
-                  "Given I search with filters, when I apply them, then results are filtered accordingly",
-                  "Given no results match, when I search, then I see a helpful 'no results' message"
-                ],
-                priority: "medium" as const,
-                complexity: "moderate" as const,
-                estimatedHours: 16,
-                isMVP: false,
-                dependencies: ["Data Management"]
-              },
-              {
-                name: "Export/Import",
-                description: "Allow users to export their data and import external data",
-                userStory: "As a user, I want to export/import data so that I can backup or migrate my information",
-                acceptanceCriteria: [
-                  "Given I have data, when I choose to export, then I receive a downloadable file",
-                  "Given I have a data file, when I import it, then my data is updated",
-                  "Given I import invalid data, when processing fails, then I see helpful error messages"
-                ],
-                priority: "low" as const,
-                complexity: "moderate" as const,
-                estimatedHours: 12,
-                isMVP: false,
-                dependencies: ["Data Management"]
-              }
-            ]
+            features: fallbackFeatures
           }
         ],
-        mvpFeatures: ["User Registration", "User Authentication", "Core Feature Implementation", "Data Management"],
-        developmentOrder: ["User Registration", "User Authentication", "Core Feature Implementation", "Data Management", "User Profile", "Search Functionality", "Export/Import"],
-        totalMVPHours: 78,
-        totalFullHours: 110
+        mvpFeatures: fallbackFeatures.filter(f => f.isMVP).map(f => f.name),
+        developmentOrder: fallbackFeatures.map(f => f.name),
+        developmentPhases: [
+          {
+            phase: "Phase 1: MVP",
+            features: fallbackFeatures.filter(f => f.isMVP).map(f => f.name),
+            estimatedWeeks: 4
+          },
+          {
+            phase: "Phase 2: V1",
+            features: [],
+            estimatedWeeks: 2
+          }
+        ],
+        totalMVPHours: fallbackFeatures.filter(f => f.isMVP).reduce((sum, f) => sum + f.estimatedHours, 0),
+        totalFullHours: fallbackFeatures.reduce((sum, f) => sum + f.estimatedHours, 0)
       };
     }
   }

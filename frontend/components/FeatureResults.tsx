@@ -30,10 +30,17 @@ interface FeatureCategory {
   features: Feature[];
 }
 
+interface DevelopmentPhase {
+  phase: string;
+  features: string[];
+  estimatedWeeks: number;
+}
+
 interface FeatureData {
   categories: FeatureCategory[];
   mvpFeatures: string[];
   developmentOrder: string[];
+  developmentPhases: DevelopmentPhase[];
   totalMVPHours: number;
   totalFullHours: number;
 }

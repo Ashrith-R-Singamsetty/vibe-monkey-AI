@@ -12,9 +12,10 @@ export function HomePage() {
     setIsAnalyzing(true);
     
     try {
-      // Store the idea data and navigate to analysis
       const analysisId = Date.now().toString();
+      // Store the idea data and a reference to it
       localStorage.setItem(`analysis_${analysisId}`, JSON.stringify(ideaData));
+      localStorage.setItem('latestAnalysisId', analysisId);
       navigate(`/analysis/${analysisId}`);
     } catch (error) {
       console.error('Error starting analysis:', error);

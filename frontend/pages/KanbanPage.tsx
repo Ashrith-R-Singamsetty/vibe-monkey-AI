@@ -12,31 +12,42 @@ export default function KanbanPage() {
 
   useEffect(() => {
     if (!results || !data || !results.features) {
-      const storedId = localStorage.getItem('latestAnalysisId');
-      if (storedId) {
-        const storedData = localStorage.getItem(`analysis_${storedId}`);
+      // Attempt to recover from localStorage if state is lost (e.g., on page refresh)
+      const latestAnalysisId = localStorage.getItem('latestAnalysisId');
+      if (latestAnalysisId) {
+        const storedData = localStorage.getItem(`analysis_${latestAnalysisId}`);
         if (storedData) {
-          // This is a simplified recovery, ideally you'd refetch
-          setData(JSON.parse(storedData));
-        } else {
-          navigate('/');
+          // This is a simplified recovery. A more robust solution would refetch the data.
+          const parsedData = JSON.parse(storedData);
+          setData(parsedData);
+          // We can't recover the results, so we'll have to navigate away or show an error.
+          // For now, let's just navigate home.
         }
-      } else {
+      }
+      // If we can't recover, navigate home.
+      if (!location.state?.results) {
         navigate('/');
       }
     }
-  }, [results, data, navigate]);
+  }, [results, data, navigate, location.state]);
 
   if (!results || !data || !results.features) {
-    // You might want a loading state here if you implement refetching
-    return null;
+    return (
+      <div className="text-center py-16">
+        <h1 className="text-2xl font-bold text-foreground mb-4">Roadmap Data Not Found</h1>
+        <p className="text-muted-foreground mb-4">
+          Please generate an analysis first to view the Kanban board.
+        </p>
+        <Button onClick={() => navigate('/')}>
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Home
+        </Button>
+      </div>
+    );
   }
 
   const allFeatures = results.features.categories.flatMap((category: any) => category.features);
-  const developmentPhases = results.features.developmentOrder.map((phaseName: string) => ({
-    phase: phaseName,
-    features: allFeatures.filter((f: any) => data.developmentOrder.includes(f.name)).map((f: any) => f.name)
-  }));
+  const developmentPhases = results.features.developmentPhases || [];
 
   return (
     <div className="flex flex-col h-[calc(100vh-100px)]">
@@ -48,7 +59,7 @@ export default function KanbanPage() {
             onClick={() => navigate(-1)}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+            Back to Analysis
           </Button>
           <div>
             <h1 className="text-3xl font-bold">Development Roadmap</h1>
@@ -60,7 +71,7 @@ export default function KanbanPage() {
       </div>
       <div className="flex-grow overflow-x-auto">
         <KanbanBoard 
-          phases={results.features.developmentPhases || []} 
+          phases={developmentPhases} 
           allFeatures={allFeatures} 
         />
       </div>
