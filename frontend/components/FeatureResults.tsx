@@ -14,6 +14,7 @@ import {
   Calendar,
   Users
 } from 'lucide-react';
+import { KanbanBoard } from './kanban/KanbanBoard';
 
 interface Feature {
   name: string;
@@ -46,6 +47,8 @@ interface FeatureResultsProps {
 
 export function FeatureResults({ data }: FeatureResultsProps) {
   const [expandedFeatures, setExpandedFeatures] = useState<Set<string>>(new Set());
+
+  const allFeatures = data.categories.flatMap(category => category.features);
 
   const toggleFeature = (featureName: string) => {
     const newExpanded = new Set(expandedFeatures);
@@ -84,7 +87,7 @@ export function FeatureResults({ data }: FeatureResultsProps) {
     }
   };
 
-  const mvpProgress = (data.totalMVPHours / data.totalFullHours) * 100;
+  const mvpProgress = data.totalFullHours > 0 ? (data.totalMVPHours / data.totalFullHours) * 100 : 0;
 
   return (
     <div className="space-y-8">
@@ -134,7 +137,7 @@ export function FeatureResults({ data }: FeatureResultsProps) {
       <Tabs defaultValue="features" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="features">Feature Specifications</TabsTrigger>
-          <TabsTrigger value="roadmap">Development Roadmap</TabsTrigger>
+          <TabsTrigger value="roadmap">Kanban Roadmap</TabsTrigger>
         </TabsList>
 
         <TabsContent value="features" className="space-y-6">
@@ -238,65 +241,7 @@ export function FeatureResults({ data }: FeatureResultsProps) {
         </TabsContent>
 
         <TabsContent value="roadmap" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Calendar className="w-5 h-5" />
-                <span>Development Roadmap</span>
-              </CardTitle>
-              <CardDescription>
-                Recommended order of feature development based on dependencies and priorities
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  <Card>
-                    <CardContent className="pt-4">
-                      <div className="text-center space-y-2">
-                        <h5 className="font-medium">MVP Features</h5>
-                        <div className="space-y-1">
-                          {data.mvpFeatures.map((feature, index) => (
-                            <Badge key={index} variant="outline" className="block">
-                              {feature}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardContent className="pt-4">
-                      <div className="text-center space-y-2">
-                        <h5 className="font-medium">Development Sequence</h5>
-                        <div className="space-y-2">
-                          {data.developmentOrder.map((feature, index) => (
-                            <div key={index} className="flex items-center space-x-2 text-sm">
-                              <span className="bg-gradient-to-r from-purple-500 to-pink-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">
-                                {index + 1}
-                              </span>
-                              <span>{feature}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/10 dark:to-pink-900/10 p-4 rounded-lg">
-                  <h6 className="font-medium mb-2">💡 Development Tips</h6>
-                  <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Start with MVP features to validate core assumptions</li>
-                    <li>• Follow the dependency order to avoid development blocks</li>
-                    <li>• Consider user feedback before building non-MVP features</li>
-                    <li>• Plan for iterative development and continuous deployment</li>
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <KanbanBoard phases={data.developmentPhases} allFeatures={allFeatures} />
         </TabsContent>
       </Tabs>
     </div>
