@@ -1,12 +1,10 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Clock, Target, Users } from 'lucide-react';
 import { FeaturePrioritization } from './features/FeaturePrioritization';
 import { UserFlow } from './features/UserFlow';
 import { FullSpec } from './features/FullSpec';
-import { KanbanBoard } from './kanban/KanbanBoard';
 
 interface Feature {
   name: string;
@@ -55,11 +53,6 @@ interface FeatureResultsProps {
 
 export function FeatureResults({ data }: FeatureResultsProps) {
   const mvpProgress = data.totalFullHours > 0 ? (data.totalMVPHours / data.totalFullHours) * 100 : 0;
-  const allFeatures = [
-    ...(data.mustHave || []),
-    ...(data.couldHave || []),
-    ...(data.later || []),
-  ];
 
   return (
     <div className="space-y-8">
@@ -106,32 +99,15 @@ export function FeatureResults({ data }: FeatureResultsProps) {
         </CardContent>
       </Card>
 
-      {/* New Sections */}
       <FeaturePrioritization 
         mustHave={data.mustHave || []}
         couldHave={data.couldHave || []}
         later={data.later || []}
       />
+      
       <UserFlow userFlow={data.userFlow || []} />
 
-      {/* Tabs for Detailed Views */}
-      <Tabs defaultValue="spec" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="spec">Full Specification</TabsTrigger>
-          <TabsTrigger value="kanban">Kanban Roadmap</TabsTrigger>
-        </TabsList>
-        <TabsContent value="spec">
-          <FullSpec categories={data.categories || []} />
-        </TabsContent>
-        <TabsContent value="kanban">
-          <div className="overflow-x-auto">
-            <KanbanBoard 
-              phases={data.developmentPhases || []} 
-              allFeatures={allFeatures} 
-            />
-          </div>
-        </TabsContent>
-      </Tabs>
+      <FullSpec categories={data.categories || []} />
     </div>
   );
 }

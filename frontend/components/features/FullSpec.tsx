@@ -66,17 +66,20 @@ export function FullSpec({ categories }: FullSpecProps) {
   };
 
   return (
-    <div className="space-y-6">
-      {categories.map((category, categoryIndex) => (
-        <Card key={categoryIndex}>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <span className="w-3 h-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" />
-              <span>{category.category}</span>
-              <Badge variant="outline">{category.features.length} features</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+    <Card>
+      <CardHeader>
+        <CardTitle>Full Feature Specification</CardTitle>
+        <CardDescription>
+          A detailed breakdown of all generated features, grouped by category.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {categories.map((category, categoryIndex) => (
+          <div key={categoryIndex}>
+            <h3 className="text-lg font-semibold mb-4 flex items-center">
+              <span className="w-2 h-2 bg-purple-500 rounded-full mr-3" />
+              {category.category}
+            </h3>
             <div className="space-y-4">
               {category.features.map((feature, featureIndex) => {
                 const isExpanded = expandedFeatures.has(feature.name);
@@ -161,9 +164,9 @@ export function FullSpec({ categories }: FullSpecProps) {
                 );
               })}
             </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
   );
 }

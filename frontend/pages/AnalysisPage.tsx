@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import backend from '~backend/client';
@@ -8,91 +8,24 @@ import { TechStackResults } from '../components/TechStackResults';
 import { FeatureResults } from '../components/FeatureResults';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Download, ArrowRight } from 'lucide-react';
+import { RefreshCw, Download, ArrowRight, LayoutDashboard } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-
-interface IdeaData {
-  idea: string;
-  enhancedIdea?: string;
-  industry?: string;
-  timeline?: string;
-  budget?: string;
-  teamSize?: number;
-  projectType?: string;
-  experience?: string;
-  targetAudience?: string;
-}
+import { Skeleton } from '@/components/ui/skeleton';
 
 export function AnalysisPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [ideaData, setIdeaData] = useState<IdeaData | null>(null);
   const [activeTab, setActiveTab] = useState('validation');
 
-  useEffect(() => {
-    if (id) {
-      const stored = localStorage.getItem(`analysis_${id}`);
-      if (stored) {
-        setIdeaData(JSON.parse(stored));
-      }
-    }
-  }, [id]);
-
-  const validationQuery = useQuery({
-    queryKey: ['validation', ideaData?.enhancedIdea || ideaData?.idea],
-    queryFn: () => backend.validation.validateIdea({
-      idea: ideaData?.enhancedIdea || ideaData?.idea || '',
-      industry: ideaData?.industry,
-      timeline: ideaData?.timeline,
-      budget: ideaData?.budget,
-      teamSize: ideaData?.teamSize,
-    }),
-    enabled: !!ideaData,
+  const { data: ideaData, isLoading, error, refetch } = useQuery({
+    queryKey: ['idea', id],
+    queryFn: () => backend.idea.get({ id: id! }),
+    enabled: !!id,
   });
-
-  const techStackQuery = useQuery({
-    queryKey: ['techStack', ideaData?.enhancedIdea || ideaData?.idea],
-    queryFn: () => backend.validation.getTechStack({
-      idea: ideaData?.enhancedIdea || ideaData?.idea || '',
-      projectType: ideaData?.projectType,
-      experience: ideaData?.experience,
-      timeline: ideaData?.timeline,
-      teamSize: ideaData?.teamSize,
-    }),
-    enabled: !!ideaData,
-  });
-
-  const featuresQuery = useQuery({
-    queryKey: ['features', ideaData?.enhancedIdea || ideaData?.idea],
-    queryFn: () => backend.validation.generateFeatures({
-      idea: ideaData?.enhancedIdea || ideaData?.idea || '',
-      targetAudience: ideaData?.targetAudience,
-      projectType: ideaData?.projectType,
-    }),
-    enabled: !!ideaData,
-  });
-
-  const handleRefresh = () => {
-    validationQuery.refetch();
-    techStackQuery.refetch();
-    featuresQuery.refetch();
-    toast({
-      title: "Analysis Refreshed",
-      description: "Running fresh analysis with latest AI models.",
-    });
-  };
 
   const handleExport = () => {
-    const analysisData = {
-      idea: ideaData,
-      validation: validationQuery.data,
-      techStack: techStackQuery.data,
-      features: featuresQuery.data,
-      generatedAt: new Date().toISOString(),
-    };
-
-    const blob = new Blob([JSON.stringify(analysisData, null, 2)], {
+    const blob = new Blob([JSON.stringify(ideaData, null, 2)], {
       type: 'application/json',
     });
     
@@ -112,13 +45,27 @@ export function AnalysisPage() {
   };
 
   const handleGoToKanban = () => {
-    const results = {
-      validation: validationQuery.data,
-      techStack: techStackQuery.data,
-      features: featuresQuery.data,
-    };
-    navigate("/kanban", { state: { results, data: ideaData } });
+    navigate(`/kanban/${id}`);
   };
+
+  if (isLoading) {
+    return <LoadingState />;
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-16">
+        <h2 className="text-xl font-semibold text-foreground mb-4">Analysis Error</h2>
+        <p className="text-muted-foreground mb-4">
+          There was an issue generating your analysis. Please try again.
+        </p>
+        <Button onClick={() => refetch()}>
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Try Again
+        </Button>
+      </div>
+    );
+  }
 
   if (!ideaData) {
     return (
@@ -131,32 +78,25 @@ export function AnalysisPage() {
     );
   }
 
-  const isLoading = validationQuery.isLoading || techStackQuery.isLoading || featuresQuery.isLoading;
-  const hasError = validationQuery.error || techStackQuery.error || featuresQuery.error;
-
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Analysis Results</h1>
+          <h1 className="text-3xl font-bold text-foreground">{ideaData.name}</h1>
           <p className="text-muted-foreground mt-2">
             Comprehensive AI-powered validation for your startup idea
           </p>
         </div>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={handleRefresh}
-            disabled={isLoading}
-          >
+          <Button variant="outline" onClick={() => navigate('/')}>
+            <LayoutDashboard className="w-4 h-4 mr-2" />
+            Dashboard
+          </Button>
+          <Button variant="outline" onClick={() => refetch()}>
             <RefreshCw className="w-4 h-4 mr-2" />
             Refresh
           </Button>
-          <Button
-            variant="outline"
-            onClick={handleExport}
-            disabled={isLoading}
-          >
+          <Button variant="outline" onClick={handleExport}>
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
@@ -166,59 +106,41 @@ export function AnalysisPage() {
       <div className="bg-card rounded-lg p-6 border">
         <h2 className="text-lg font-semibold text-foreground mb-2">Your Idea</h2>
         <p className="text-muted-foreground">
-          {ideaData.enhancedIdea || ideaData.idea}
+          {ideaData.enhancedIdea || ideaData.originalIdea}
         </p>
-        {ideaData.industry && (
-          <div className="flex gap-4 mt-4 text-sm text-muted-foreground">
-            <span>Industry: {ideaData.industry}</span>
-            {ideaData.timeline && <span>Timeline: {ideaData.timeline}</span>}
-            {ideaData.teamSize && <span>Team: {ideaData.teamSize} person(s)</span>}
-          </div>
-        )}
       </div>
 
-      {isLoading ? (
-        <LoadingState />
-      ) : hasError ? (
-        <div className="text-center py-16">
-          <h2 className="text-xl font-semibold text-foreground mb-4">Analysis Error</h2>
-          <p className="text-muted-foreground mb-4">
-            There was an issue generating your analysis. Please try refreshing.
-          </p>
-          <Button onClick={handleRefresh}>
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Try Again
-          </Button>
-        </div>
-      ) : (
-        <>
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="validation">Validation Analysis</TabsTrigger>
-              <TabsTrigger value="techstack">Tech Stack</TabsTrigger>
-              <TabsTrigger value="features">Features & Roadmap</TabsTrigger>
-            </TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="validation">Validation Analysis</TabsTrigger>
+          <TabsTrigger value="techstack">Tech Stack</TabsTrigger>
+          <TabsTrigger value="features">Features & Roadmap</TabsTrigger>
+        </TabsList>
 
-            <TabsContent value="validation" className="space-y-6">
-              {validationQuery.data && <ValidationResults data={validationQuery.data} />}
-            </TabsContent>
+        <TabsContent value="validation" className="space-y-6">
+          {ideaData.validationResult ? (
+            <ValidationResults data={ideaData.validationResult} />
+          ) : <Skeleton className="h-96" />}
+        </TabsContent>
 
-            <TabsContent value="techstack" className="space-y-6">
-              {techStackQuery.data && <TechStackResults data={techStackQuery.data} />}
-            </TabsContent>
+        <TabsContent value="techstack" className="space-y-6">
+          {ideaData.techStackResult ? (
+            <TechStackResults data={ideaData.techStackResult} />
+          ) : <Skeleton className="h-96" />}
+        </TabsContent>
 
-            <TabsContent value="features" className="space-y-6">
-              {featuresQuery.data && <FeatureResults data={featuresQuery.data} />}
-            </TabsContent>
-          </Tabs>
-          <div className="mt-12 text-center">
-            <Button size="lg" onClick={handleGoToKanban} className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
-              Visualize on Kanban Board
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-        </>
-      )}
+        <TabsContent value="features" className="space-y-6">
+          {ideaData.featuresResult ? (
+            <FeatureResults data={ideaData.featuresResult} />
+          ) : <Skeleton className="h-96" />}
+        </TabsContent>
+      </Tabs>
+      <div className="mt-12 text-center">
+        <Button size="lg" onClick={handleGoToKanban} className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+          Visualize on Kanban Board
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
+      </div>
     </div>
   );
 }
