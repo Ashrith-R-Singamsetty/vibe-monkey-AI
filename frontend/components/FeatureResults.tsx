@@ -1,17 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { 
-  CheckCircle, 
-  Clock, 
-  AlertCircle, 
-  ChevronDown, 
-  ChevronUp,
-  Target,
-  Users
-} from 'lucide-react';
+import { Clock, Target, Users } from 'lucide-react';
+import { FeaturePrioritization } from './features/FeaturePrioritization';
+import { UserFlow } from './features/UserFlow';
+import { FullSpec } from './features/FullSpec';
+import { KanbanBoard } from './kanban/KanbanBoard';
 
 interface Feature {
   name: string;
@@ -36,10 +31,19 @@ interface DevelopmentPhase {
   estimatedWeeks: number;
 }
 
+interface UserFlowStep {
+  screen: string;
+  description: string;
+  components: string[];
+  purpose: string;
+}
+
 interface FeatureData {
   categories: FeatureCategory[];
-  mvpFeatures: string[];
-  developmentOrder: string[];
+  mustHave: Feature[];
+  couldHave: Feature[];
+  later: Feature[];
+  userFlow: UserFlowStep[];
   developmentPhases: DevelopmentPhase[];
   totalMVPHours: number;
   totalFullHours: number;
@@ -50,46 +54,12 @@ interface FeatureResultsProps {
 }
 
 export function FeatureResults({ data }: FeatureResultsProps) {
-  const [expandedFeatures, setExpandedFeatures] = useState<Set<string>>(new Set());
-
-  const toggleFeature = (featureName: string) => {
-    const newExpanded = new Set(expandedFeatures);
-    if (newExpanded.has(featureName)) {
-      newExpanded.delete(featureName);
-    } else {
-      newExpanded.add(featureName);
-    }
-    setExpandedFeatures(newExpanded);
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400';
-      case 'low': return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400';
-    }
-  };
-
-  const getComplexityColor = (complexity: string) => {
-    switch (complexity) {
-      case 'simple': return 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400';
-      case 'moderate': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400';
-      case 'complex': return 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400';
-    }
-  };
-
-  const getPriorityIcon = (priority: string) => {
-    switch (priority) {
-      case 'high': return <AlertCircle className="w-4 h-4 text-red-500" />;
-      case 'medium': return <Clock className="w-4 h-4 text-yellow-500" />;
-      case 'low': return <CheckCircle className="w-4 h-4 text-green-500" />;
-      default: return null;
-    }
-  };
-
   const mvpProgress = data.totalFullHours > 0 ? (data.totalMVPHours / data.totalFullHours) * 100 : 0;
+  const allFeatures = [
+    ...(data.mustHave || []),
+    ...(data.couldHave || []),
+    ...(data.later || []),
+  ];
 
   return (
     <div className="space-y-8">
@@ -108,7 +78,7 @@ export function FeatureResults({ data }: FeatureResultsProps) {
                 <Target className="w-6 h-6 text-white" />
               </div>
               <h5 className="font-medium">MVP Features</h5>
-              <p className="text-2xl font-bold text-foreground">{data.mvpFeatures.length}</p>
+              <p className="text-2xl font-bold text-foreground">{data.mustHave?.length || 0}</p>
             </div>
             <div className="text-center space-y-2">
               <div className="bg-gradient-to-r from-green-500 to-emerald-500 w-12 h-12 rounded-lg flex items-center justify-center mx-auto">
@@ -136,106 +106,32 @@ export function FeatureResults({ data }: FeatureResultsProps) {
         </CardContent>
       </Card>
 
-      {/* Feature Specifications */}
-      <div className="space-y-6">
-        {data.categories.map((category, categoryIndex) => (
-          <Card key={categoryIndex}>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <span className="w-3 h-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" />
-                <span>{category.category}</span>
-                <Badge variant="outline">{category.features.length} features</Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {category.features.map((feature, featureIndex) => {
-                  const isExpanded = expandedFeatures.has(feature.name);
-                  
-                  return (
-                    <div key={featureIndex} className="border rounded-lg p-4 space-y-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 space-y-2">
-                          <div className="flex items-center space-x-2">
-                            {getPriorityIcon(feature.priority)}
-                            <h5 className="font-semibold">{feature.name}</h5>
-                            {feature.isMVP && (
-                              <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-                                MVP
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            {feature.description}
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            <Badge className={getPriorityColor(feature.priority)}>
-                              {feature.priority} priority
-                            </Badge>
-                            <Badge className={getComplexityColor(feature.complexity)}>
-                              {feature.complexity}
-                            </Badge>
-                            <Badge variant="outline">
-                              {feature.estimatedHours}h
-                            </Badge>
-                          </div>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => toggleFeature(feature.name)}
-                        >
-                          {isExpanded ? (
-                            <ChevronUp className="w-4 h-4" />
-                          ) : (
-                            <ChevronDown className="w-4 h-4" />
-                          )}
-                        </Button>
-                      </div>
+      {/* New Sections */}
+      <FeaturePrioritization 
+        mustHave={data.mustHave || []}
+        couldHave={data.couldHave || []}
+        later={data.later || []}
+      />
+      <UserFlow userFlow={data.userFlow || []} />
 
-                      {isExpanded && (
-                        <div className="space-y-4 pt-4 border-t">
-                          <div>
-                            <h6 className="font-medium mb-2">User Story</h6>
-                            <p className="text-sm text-muted-foreground italic">
-                              {feature.userStory}
-                            </p>
-                          </div>
-
-                          <div>
-                            <h6 className="font-medium mb-2">Acceptance Criteria</h6>
-                            <ul className="space-y-1">
-                              {feature.acceptanceCriteria.map((criteria, idx) => (
-                                <li key={idx} className="text-sm text-muted-foreground flex items-start">
-                                  <CheckCircle className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                                  {criteria}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          {feature.dependencies.length > 0 && (
-                            <div>
-                              <h6 className="font-medium mb-2">Dependencies</h6>
-                              <div className="flex flex-wrap gap-2">
-                                {feature.dependencies.map((dep, idx) => (
-                                  <Badge key={idx} variant="outline" className="text-xs">
-                                    {dep}
-                                  </Badge>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {/* Tabs for Detailed Views */}
+      <Tabs defaultValue="spec" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="spec">Full Specification</TabsTrigger>
+          <TabsTrigger value="kanban">Kanban Roadmap</TabsTrigger>
+        </TabsList>
+        <TabsContent value="spec">
+          <FullSpec categories={data.categories || []} />
+        </TabsContent>
+        <TabsContent value="kanban">
+          <div className="overflow-x-auto">
+            <KanbanBoard 
+              phases={data.developmentPhases || []} 
+              allFeatures={allFeatures} 
+            />
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

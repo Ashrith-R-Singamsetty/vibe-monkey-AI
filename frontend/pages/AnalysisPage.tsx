@@ -213,7 +213,7 @@ export function AnalysisPage() {
           </Tabs>
           <div className="mt-12 text-center">
             <Button size="lg" onClick={handleGoToKanban} className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
-              Next Kanban
+              Visualize on Kanban Board
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>

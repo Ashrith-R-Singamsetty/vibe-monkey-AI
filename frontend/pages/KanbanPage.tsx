@@ -11,25 +11,21 @@ export default function KanbanPage() {
   const [data, setData] = useState(location.state?.data);
 
   useEffect(() => {
-    if (!results || !data || !results.features) {
-      // Attempt to recover from localStorage if state is lost (e.g., on page refresh)
+    if (!location.state?.results || !location.state?.data) {
       const latestAnalysisId = localStorage.getItem('latestAnalysisId');
       if (latestAnalysisId) {
-        const storedData = localStorage.getItem(`analysis_${latestAnalysisId}`);
-        if (storedData) {
-          // This is a simplified recovery. A more robust solution would refetch the data.
-          const parsedData = JSON.parse(storedData);
-          setData(parsedData);
-          // We can't recover the results, so we'll have to navigate away or show an error.
-          // For now, let's just navigate home.
-        }
-      }
-      // If we can't recover, navigate home.
-      if (!location.state?.results) {
+        // In a real app, you'd refetch data here based on the ID
+        // For now, we'll just navigate back as we don't have the data
+        console.warn("Kanban page loaded without state, navigating home.");
+        navigate('/');
+      } else {
         navigate('/');
       }
+    } else {
+      setResults(location.state.results);
+      setData(location.state.data);
     }
-  }, [results, data, navigate, location.state]);
+  }, [location.state, navigate]);
 
   if (!results || !data || !results.features) {
     return (
@@ -46,7 +42,12 @@ export default function KanbanPage() {
     );
   }
 
-  const allFeatures = results.features.categories.flatMap((category: any) => category.features);
+  const allFeatures = [
+    ...(results.features.mustHave || []),
+    ...(results.features.couldHave || []),
+    ...(results.features.later || []),
+  ];
+  
   const developmentPhases = results.features.developmentPhases || [];
 
   return (
