@@ -77,7 +77,7 @@ export default function KanbanPage() {
           Dashboard
         </Button>
       </div>
-      <div className="flex-grow overflow-x-auto pb-4">
+      <div className="flex-grow overflow-x-auto">
         <KanbanBoard 
           phases={developmentPhases} 
           allFeatures={allFeatures} 
