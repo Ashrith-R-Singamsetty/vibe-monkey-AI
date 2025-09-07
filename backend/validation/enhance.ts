@@ -14,6 +14,7 @@ interface EnhanceIdeaResponse {
 
 // Enhances a raw startup idea description using AI.
 export const enhanceIdea = api<EnhanceIdeaRequest, EnhanceIdeaResponse>({
+  expose: true,
   method: "POST",
   path: "/enhance",
 }, async (req) => {
