@@ -65,26 +65,26 @@ export function TechStackResults({ data }: TechStackResultsProps) {
   return (
     <div className="space-y-8">
       {/* Overview */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Technology Stack Overview</CardTitle>
-          <CardDescription>
+      <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200/50 shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-t-lg">
+          <CardTitle className="text-2xl">Technology Stack Overview</CardTitle>
+          <CardDescription className="text-purple-100">
             Personalized recommendations based on your project requirements
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-muted-foreground">{data.overallApproach}</p>
+        <CardContent className="space-y-4 bg-white/80 backdrop-blur-sm">
+          <p className="text-gray-600">{data.overallApproach}</p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <h5 className="font-medium">Development Complexity</h5>
-              <Badge className={getComplexityColor(data.estimatedComplexity)}>
+            <div className="space-y-2 p-4 bg-white/60 rounded-lg border border-purple-100/50">
+              <h5 className="font-medium text-gray-700">Development Complexity</h5>
+              <Badge className={`${getComplexityColor(data.estimatedComplexity)} font-medium`}>
                 {data.estimatedComplexity.charAt(0).toUpperCase() + data.estimatedComplexity.slice(1)}
               </Badge>
             </div>
-            <div className="space-y-2">
-              <h5 className="font-medium">Estimated Time to MVP</h5>
-              <Badge variant="outline">{data.timeToMVP}</Badge>
+            <div className="space-y-2 p-4 bg-white/60 rounded-lg border border-purple-100/50">
+              <h5 className="font-medium text-gray-700">Estimated Time to MVP</h5>
+              <Badge variant="outline" className="border-purple-200 text-purple-700 font-medium">{data.timeToMVP}</Badge>
             </div>
           </div>
         </CardContent>
@@ -93,20 +93,20 @@ export function TechStackResults({ data }: TechStackResultsProps) {
       {/* Technology Recommendations */}
       <div className="space-y-6">
         {Object.entries(categorizedRecommendations).map(([category, recommendations]) => (
-          <Card key={category}>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2 capitalize">
+          <Card key={category} className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200/50 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-t-lg">
+              <CardTitle className="flex items-center space-x-2 capitalize text-xl">
                 {getCategoryIcon(category)}
                 <span>{category}</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="bg-white/80 backdrop-blur-sm">
               <div className="space-y-4">
                 {recommendations.map((rec, index) => (
-                  <div key={index} className="p-4 border rounded-lg space-y-3">
+                  <div key={index} className="p-4 border border-purple-100/50 rounded-lg space-y-3 bg-white/60 hover:bg-white/80 transition-colors">
                     <div className="flex items-start justify-between">
                       <div>
-                        <h5 className="font-semibold text-lg">{rec.name}</h5>
+                        <h5 className="font-semibold text-lg text-gray-800">{rec.name}</h5>
                         <Badge className={getDifficultyColor(rec.difficulty)}>
                           {rec.difficulty}
                         </Badge>
@@ -115,6 +115,7 @@ export function TechStackResults({ data }: TechStackResultsProps) {
                         variant="outline"
                         size="sm"
                         asChild
+                        className="border-purple-200 text-purple-700 hover:bg-purple-50"
                       >
                         <a href={rec.documentation} target="_blank" rel="noopener noreferrer">
                           <ExternalLink className="w-4 h-4 mr-2" />
@@ -157,18 +158,18 @@ export function TechStackResults({ data }: TechStackResultsProps) {
 
       {/* Learning Resources */}
       {data.learningResources.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Learning Resources</CardTitle>
-            <CardDescription>
+        <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200/50 shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-t-lg">
+            <CardTitle className="text-xl">Learning Resources</CardTitle>
+            <CardDescription className="text-purple-100">
               Recommended resources to get started with your tech stack
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="bg-white/80 backdrop-blur-sm">
             <ul className="space-y-2">
               {data.learningResources.map((resource, index) => (
-                <li key={index} className="flex items-center text-sm">
-                  <span className="w-2 h-2 bg-purple-500 rounded-full mr-3" />
+                <li key={index} className="flex items-center text-sm text-gray-700">
+                  <span className="w-2 h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mr-3" />
                   {resource}
                 </li>
               ))}
