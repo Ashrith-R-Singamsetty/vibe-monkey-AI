@@ -12,9 +12,8 @@ export const list = api<void, ListResponse>({
   method: "GET",
   path: "/ideas",
 }, async () => {
-  const result = await ideaDB.query<IdeaSummary>`
+  const ideas = await ideaDB.queryAll<IdeaSummary>`
     SELECT id, name, created_at AS "createdAt" FROM ideas ORDER BY created_at DESC
   `;
-  const ideas = await result.all();
   return { ideas };
 });
