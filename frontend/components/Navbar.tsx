@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Zap } from 'lucide-react';
+import { LogoWithText } from '@/components/ui/logo';
 
 interface NavbarProps {
   className?: string;
@@ -25,21 +25,12 @@ export function Navbar({ className = "" }: NavbarProps) {
     >
       {/* Logo Section */}
       <motion.div 
-        className="flex items-center space-x-2 cursor-pointer" 
+        className="cursor-pointer" 
         onClick={() => navigate('/')}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
-        <motion.div 
-          className="bg-gradient-to-r from-purple-600 to-pink-600 p-2 rounded-lg"
-          whileHover={{ rotate: 360 }}
-          transition={{ duration: 0.6 }}
-        >
-          <Zap className="w-6 h-6 text-white" />
-        </motion.div>
-        <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-          Vibe Monkey AI
-        </span>
+        <LogoWithText size="md" animate={true} />
       </motion.div>
       
       {/* Navigation Links */}
