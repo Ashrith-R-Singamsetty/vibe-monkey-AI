@@ -6,12 +6,14 @@ import { Navigation } from './components/Navigation';
 import { DashboardPage } from './pages/DashboardPage';
 import { AnalysisPage } from './pages/AnalysisPage';
 import KanbanPage from './pages/KanbanPage';
+import { LandingPage } from './pages/LandingPage';
+import { FeaturesPage } from './pages/FeaturesPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000,
-      cacheTime: 10 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
       retry: false,
     },
   },
@@ -20,15 +22,14 @@ const queryClient = new QueryClient({
 function AppInner() {
   return (
     <Router>
-      <div className="min-h-screen bg-background">
-        <Navigation />
-        <main className="container mx-auto px-4 py-8">
-          <Routes>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/analysis/:id" element={<AnalysisPage />} />
-            <Route path="/kanban/:id" element={<KanbanPage />} />
-          </Routes>
-        </main>
+      <div className="min-h-screen">
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/features" element={<FeaturesPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/analysis/:id" element={<AnalysisPage />} />
+          <Route path="/kanban/:id" element={<KanbanPage />} />
+        </Routes>
         <Toaster />
       </div>
     </Router>

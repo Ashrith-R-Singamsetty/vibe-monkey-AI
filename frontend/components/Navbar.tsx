@@ -6,9 +6,11 @@ import { LogoWithText } from '@/components/ui/logo';
 
 interface NavbarProps {
   className?: string;
+  showFeatures?: boolean;
+  showTryForFree?: boolean;
 }
 
-export function Navbar({ className = "" }: NavbarProps) {
+export function Navbar({ className = "", showFeatures = true, showTryForFree = true }: NavbarProps) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -48,30 +50,34 @@ export function Navbar({ className = "" }: NavbarProps) {
           Home
         </motion.button>
         
-        <motion.button 
-          onClick={() => navigate('/features')} 
-          className={`transition-colors ${
-            isFeatures 
-              ? 'text-purple-600 font-medium' 
-              : 'text-gray-600 hover:text-purple-600'
-          }`}
-          whileHover={{ scale: 1.1, y: -2 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          Features
-        </motion.button>
-        
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Button 
-            onClick={() => navigate('/dashboard')}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+        {showFeatures && (
+          <motion.button 
+            onClick={() => navigate('/features')} 
+            className={`transition-colors ${
+              isFeatures 
+                ? 'text-purple-600 font-medium' 
+                : 'text-gray-600 hover:text-purple-600'
+            }`}
+            whileHover={{ scale: 1.1, y: -2 }}
+            whileTap={{ scale: 0.95 }}
           >
-            Try For Free
-          </Button>
-        </motion.div>
+            Features
+          </motion.button>
+        )}
+        
+        {showTryForFree && (
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button 
+              onClick={() => navigate('/dashboard')}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+            >
+              Try For Free
+            </Button>
+          </motion.div>
+        )}
       </div>
     </motion.nav>
   );
