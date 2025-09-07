@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-import { Loader2, Plus } from 'lucide-react';
+import { Loader2, Plus, Sparkles } from 'lucide-react';
 
 interface CreateIdeaDialogProps {
   onIdeaCreated: () => void;
@@ -26,8 +26,31 @@ export function CreateIdeaDialog({ onIdeaCreated }: CreateIdeaDialogProps) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [originalIdea, setOriginalIdea] = useState('');
+  const [isEnhancing, setIsEnhancing] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const enhanceMutation = useMutation({
+    mutationFn: (idea: string) => backend.validation.enhanceIdea({ originalIdea: idea }),
+    onSuccess: (data) => {
+      setOriginalIdea(data.enhancedDescription);
+      toast({
+        title: 'Idea Enhanced!',
+        description: 'Your idea has been improved by AI.',
+      });
+    },
+    onError: (error) => {
+      console.error('Enhancement error:', error);
+      toast({
+        title: 'Enhancement Failed',
+        description: 'Could not enhance your idea. You can still proceed with the original.',
+        variant: 'destructive',
+      });
+    },
+    onSettled: () => {
+      setIsEnhancing(false);
+    },
+  });
 
   const createMutation = useMutation({
     mutationFn: (newIdea: { name: string; originalIdea: string; context: any }) =>
@@ -50,6 +73,19 @@ export function CreateIdeaDialog({ onIdeaCreated }: CreateIdeaDialogProps) {
       });
     },
   });
+
+  const handleEnhance = () => {
+    if (!originalIdea.trim()) {
+      toast({
+        title: 'No Description',
+        description: 'Please enter an idea description first.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setIsEnhancing(true);
+    enhanceMutation.mutate(originalIdea);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,14 +124,34 @@ export function CreateIdeaDialog({ onIdeaCreated }: CreateIdeaDialogProps) {
           </div>
           <div className="space-y-2">
             <Label htmlFor="description">Idea Description</Label>
-            <Textarea
-              id="description"
-              value={originalIdea}
-              onChange={(e) => setOriginalIdea(e.target.value)}
-              placeholder="Describe your startup idea..."
-              className="min-h-[100px]"
-              required
-            />
+            <div className="relative">
+              <Textarea
+                id="description"
+                value={originalIdea}
+                onChange={(e) => setOriginalIdea(e.target.value)}
+                placeholder="Describe your startup idea..."
+                className="min-h-[100px] pr-12"
+                required
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute top-2 right-2 h-8 w-8 p-0"
+                onClick={handleEnhance}
+                disabled={isEnhancing || !originalIdea.trim()}
+                title="Enhance with AI"
+              >
+                {isEnhancing ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Sparkles className="w-4 h-4 text-purple-500" />
+                )}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Click the ✨ icon to enhance your description with AI
+            </p>
           </div>
           <DialogFooter>
             <Button type="submit" disabled={createMutation.isPending}>
