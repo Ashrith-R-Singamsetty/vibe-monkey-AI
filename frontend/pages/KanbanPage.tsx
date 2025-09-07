@@ -19,14 +19,12 @@ export default function KanbanPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-          <Skeleton className="h-12 w-1/2 rounded-xl" />
-          <div className="flex gap-6">
-            <Skeleton className="h-[500px] w-[350px] rounded-xl" />
-            <Skeleton className="h-[500px] w-[350px] rounded-xl" />
-            <Skeleton className="h-[500px] w-[350px] rounded-xl" />
-          </div>
+      <div className="space-y-8">
+        <Skeleton className="h-12 w-1/2" />
+        <div className="flex gap-4">
+          <Skeleton className="h-[500px] w-[350px]" />
+          <Skeleton className="h-[500px] w-[350px]" />
+          <Skeleton className="h-[500px] w-[350px]" />
         </div>
       </div>
     );
@@ -34,19 +32,15 @@ export default function KanbanPage() {
 
   if (error || !ideaData) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center py-32">
-            <h1 className="text-2xl font-bold text-foreground mb-4">Roadmap Not Found</h1>
-            <p className="text-muted-foreground mb-6">
-              Could not load the development roadmap for this idea.
-            </p>
-            <Button onClick={() => navigate('/')} size="lg" variant="outline">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Button>
-          </div>
-        </div>
+      <div className="text-center py-16">
+        <h1 className="text-2xl font-bold text-foreground mb-4">Roadmap Not Found</h1>
+        <p className="text-muted-foreground mb-4">
+          Could not load the development roadmap for this idea.
+        </p>
+        <Button onClick={() => navigate('/')}>
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Dashboard
+        </Button>
       </div>
     );
   }
@@ -60,39 +54,34 @@ export default function KanbanPage() {
   const developmentPhases = ideaData.featuresResult?.developmentPhases || [];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col h-screen">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => navigate(`/analysis/${id}`)}
-              className="shadow-sm"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Analysis
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Development Roadmap</h1>
-              <p className="text-muted-foreground mt-1">
-                Visualize and manage features for "{ideaData.name}".
-              </p>
-            </div>
-          </div>
-          <Button variant="outline" onClick={() => navigate('/')} className="shadow-sm">
-            <LayoutDashboard className="w-4 h-4 mr-2" />
-            Dashboard
+    <div className="flex flex-col h-[calc(100vh-120px)]">
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => navigate(`/analysis/${id}`)}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Analysis
           </Button>
-        </div>
-        <div className="flex-1 min-h-0">
-          <div className="h-full overflow-auto">
-            <KanbanBoard 
-              phases={developmentPhases} 
-              allFeatures={allFeatures} 
-            />
+          <div>
+            <h1 className="text-3xl font-bold">Development Roadmap</h1>
+            <p className="text-muted-foreground">
+              Visualize and manage features for "{ideaData.name}".
+            </p>
           </div>
         </div>
+        <Button variant="outline" onClick={() => navigate('/')}>
+          <LayoutDashboard className="w-4 h-4 mr-2" />
+          Dashboard
+        </Button>
+      </div>
+      <div className="flex-grow overflow-x-auto pb-4">
+        <KanbanBoard 
+          phases={developmentPhases} 
+          allFeatures={allFeatures} 
+        />
       </div>
     </div>
   );
