@@ -57,44 +57,44 @@ export function FeatureResults({ data }: FeatureResultsProps) {
   return (
     <div className="space-y-8">
       {/* Overview */}
-      <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200/50 shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-t-lg">
-          <CardTitle className="text-2xl">Feature & Development Overview</CardTitle>
-          <CardDescription className="text-purple-100">
+      <Card>
+        <CardHeader>
+          <CardTitle>Feature & Development Overview</CardTitle>
+          <CardDescription>
             Comprehensive feature specification and development roadmap
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center space-y-2 p-4 bg-white/80 backdrop-blur-sm rounded-lg border border-purple-100/50 hover:shadow-md transition-shadow">
-              <div className="bg-gradient-to-r from-purple-500 to-pink-500 w-12 h-12 rounded-lg flex items-center justify-center mx-auto">
+            <div className="text-center space-y-2">
+              <div className="bg-gradient-to-r from-blue-500 to-cyan-500 w-12 h-12 rounded-lg flex items-center justify-center mx-auto">
                 <Target className="w-6 h-6 text-white" />
               </div>
-              <h5 className="font-medium text-gray-700">MVP Features</h5>
-              <p className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">{data.mustHave?.length || 0}</p>
+              <h5 className="font-medium">MVP Features</h5>
+              <p className="text-2xl font-bold text-foreground">{data.mustHave?.length || 0}</p>
             </div>
-            <div className="text-center space-y-2 p-4 bg-white/80 backdrop-blur-sm rounded-lg border border-purple-100/50 hover:shadow-md transition-shadow">
-              <div className="bg-gradient-to-r from-purple-500 to-pink-500 w-12 h-12 rounded-lg flex items-center justify-center mx-auto">
+            <div className="text-center space-y-2">
+              <div className="bg-gradient-to-r from-green-500 to-emerald-500 w-12 h-12 rounded-lg flex items-center justify-center mx-auto">
                 <Clock className="w-6 h-6 text-white" />
               </div>
-              <h5 className="font-medium text-gray-700">MVP Hours</h5>
-              <p className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">{data.totalMVPHours}</p>
+              <h5 className="font-medium">MVP Hours</h5>
+              <p className="text-2xl font-bold text-foreground">{data.totalMVPHours}</p>
             </div>
-            <div className="text-center space-y-2 p-4 bg-white/80 backdrop-blur-sm rounded-lg border border-purple-100/50 hover:shadow-md transition-shadow">
+            <div className="text-center space-y-2">
               <div className="bg-gradient-to-r from-purple-500 to-pink-500 w-12 h-12 rounded-lg flex items-center justify-center mx-auto">
                 <Users className="w-6 h-6 text-white" />
               </div>
-              <h5 className="font-medium text-gray-700">Total Hours</h5>
-              <p className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">{data.totalFullHours}</p>
+              <h5 className="font-medium">Total Hours</h5>
+              <p className="text-2xl font-bold text-foreground">{data.totalFullHours}</p>
             </div>
           </div>
 
           <div className="space-y-2">
-            <div className="flex justify-between text-sm font-medium">
-              <span className="text-gray-700">MVP Progress</span>
-              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">{Math.round(mvpProgress)}% of total scope</span>
+            <div className="flex justify-between text-sm">
+              <span>MVP Progress</span>
+              <span>{Math.round(mvpProgress)}% of total scope</span>
             </div>
-            <Progress value={mvpProgress} className="h-3 bg-purple-100" />
+            <Progress value={mvpProgress} className="h-2" />
           </div>
         </CardContent>
       </Card>
