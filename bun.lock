@@ -3,6 +3,10 @@
   "workspaces": {
     "": {
       "name": "leap-app",
+      "devDependencies": {
+        "@types/react": "^19.1.12",
+        "@types/react-dom": "^19.1.9",
+      },
     },
     "backend": {
       "name": "backend",

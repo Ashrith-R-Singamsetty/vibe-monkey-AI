@@ -2,15 +2,13 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { LogoWithText } from '@/components/ui/logo';
+import { Zap } from 'lucide-react';
 
 interface NavbarProps {
   className?: string;
-  showFeatures?: boolean;
-  showTryForFree?: boolean;
 }
 
-export function Navbar({ className = "", showFeatures = true, showTryForFree = true }: NavbarProps) {
+export function Navbar({ className = "" }: NavbarProps) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -27,12 +25,21 @@ export function Navbar({ className = "", showFeatures = true, showTryForFree = t
     >
       {/* Logo Section */}
       <motion.div 
-        className="cursor-pointer" 
+        className="flex items-center space-x-2 cursor-pointer" 
         onClick={() => navigate('/')}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
-        <LogoWithText size="md" animate={true} />
+        <motion.div 
+          className="bg-gradient-to-r from-purple-600 to-pink-600 p-2 rounded-lg"
+          whileHover={{ rotate: 360 }}
+          transition={{ duration: 0.6 }}
+        >
+          <Zap className="w-6 h-6 text-white" />
+        </motion.div>
+        <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          Vibe Monkey AI
+        </span>
       </motion.div>
       
       {/* Navigation Links */}
@@ -50,34 +57,30 @@ export function Navbar({ className = "", showFeatures = true, showTryForFree = t
           Home
         </motion.button>
         
-        {showFeatures && (
-          <motion.button 
-            onClick={() => navigate('/features')} 
-            className={`transition-colors ${
-              isFeatures 
-                ? 'text-purple-600 font-medium' 
-                : 'text-gray-600 hover:text-purple-600'
-            }`}
-            whileHover={{ scale: 1.1, y: -2 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Features
-          </motion.button>
-        )}
+        <motion.button 
+          onClick={() => navigate('/features')} 
+          className={`transition-colors ${
+            isFeatures 
+              ? 'text-purple-600 font-medium' 
+              : 'text-gray-600 hover:text-purple-600'
+          }`}
+          whileHover={{ scale: 1.1, y: -2 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          Features
+        </motion.button>
         
-        {showTryForFree && (
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <Button 
+            onClick={() => navigate('/dashboard')}
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
           >
-            <Button 
-              onClick={() => navigate('/dashboard')}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-            >
-              Try For Free
-            </Button>
-          </motion.div>
-        )}
+            Try For Free
+          </Button>
+        </motion.div>
       </div>
     </motion.nav>
   );

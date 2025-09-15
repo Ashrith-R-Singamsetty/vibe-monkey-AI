@@ -6,8 +6,11 @@ import { Navigation } from './components/Navigation';
 import { DashboardPage } from './pages/DashboardPage';
 import { AnalysisPage } from './pages/AnalysisPage';
 import KanbanPage from './pages/KanbanPage';
-import { LandingPage } from './pages/LandingPage';
-import { FeaturesPage } from './pages/FeaturesPage';
+import { AuthProvider } from './contexts/AuthContext';
+import { LoginPage } from './pages/LoginPage';
+import { SignupPage } from './pages/SignupPage';
+import { MagicSentPage } from './pages/MagicSentPage';
+import { AccountPage } from './pages/AccountPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,14 +25,19 @@ const queryClient = new QueryClient({
 function AppInner() {
   return (
     <Router>
-      <div className="min-h-screen">
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/features" element={<FeaturesPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/analysis/:id" element={<AnalysisPage />} />
-          <Route path="/kanban/:id" element={<KanbanPage />} />
-        </Routes>
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="container mx-auto px-4 py-8">
+          <Routes>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/analysis/:id" element={<AnalysisPage />} />
+            <Route path="/kanban/:id" element={<KanbanPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/magic-sent" element={<MagicSentPage />} />
+            <Route path="/account" element={<AccountPage />} />
+          </Routes>
+        </main>
         <Toaster />
       </div>
     </Router>
@@ -39,7 +47,9 @@ function AppInner() {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AppInner />
+      <AuthProvider>
+        <AppInner />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
